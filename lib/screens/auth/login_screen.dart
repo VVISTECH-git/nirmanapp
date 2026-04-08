@@ -16,9 +16,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _signInWithGoogle() async {
     setState(() { _loading = true; _error = null; });
     try {
-      await SupabaseService.signInWithGoogle();
+      final success = await SupabaseService.signInWithGoogle();
+      if (!success && mounted) {
+        setState(() => _error = 'Sign in cancelled. Please try again.');
+      }
     } catch (e) {
-      setState(() { _error = 'Sign in failed. Please try again.'; });
+      if (mounted) {
+        setState(() => _error = 'Error: $e');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -34,16 +39,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              // Logo
               Container(
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF378ADD),
+                  color: const Color(0xFF1A0A04),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: const Center(
-                  child: Text('N', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: Colors.white)),
+                  child: Text('N', style: TextStyle(
+                    fontSize: 42,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFFFF6B2B),
+                    fontFamily: 'Arial Black',
+                  )),
                 ),
               ),
               const SizedBox(height: 20),
@@ -53,7 +62,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const Text('Track your house construction',
                   style: TextStyle(fontSize: 15, color: Color(0xFF9E9E9E))),
               const Spacer(flex: 2),
-              // Google Sign In Button
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -71,8 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           children: [
                             Image.network(
                               'https://www.google.com/favicon.ico',
-                              width: 20,
-                              height: 20,
+                              width: 20, height: 20,
                               errorBuilder: (_, __, ___) => const Icon(Icons.g_mobiledata, size: 24, color: Color(0xFFE24B4A)),
                             ),
                             const SizedBox(width: 12),
@@ -84,7 +91,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               if (_error != null) ...[
                 const SizedBox(height: 12),
-                Text(_error!, style: const TextStyle(color: Color(0xFFE24B4A), fontSize: 13)),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFCEBEB),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(_error!,
+                      style: const TextStyle(color: Color(0xFFE24B4A), fontSize: 13)),
+                ),
               ],
               const SizedBox(height: 20),
               const Text(
