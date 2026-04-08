@@ -27,13 +27,11 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"/>
 
-            <!-- Main launcher intent -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <!-- Deep link for Google OAuth callback: io.nirmanapp://login-callback -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -45,14 +43,12 @@
 
         </activity>
 
-        <!-- Flutter embedding -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>
 
     </application>
 
-    <!-- Required for Android 12+ -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW"/>
