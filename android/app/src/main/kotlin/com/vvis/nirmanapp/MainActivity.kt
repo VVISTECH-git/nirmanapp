@@ -1,4 +1,4 @@
-package com.nirmanapp.nirmanapp
+package com.vvis.nirmanapp
 
 import io.flutter.embedding.android.FlutterActivity
 
