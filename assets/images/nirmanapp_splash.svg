@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <!-- Background -->
+  <rect width="1080" height="1920" fill="#1A0A04"/>
+
+  <!-- Subtle full brick pattern background -->
+  <rect x="0" y="0" width="520" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="540" y="0" width="540" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="0" y="120" width="330" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="350" y="120" width="730" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="0" y="240" width="620" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="640" y="240" width="440" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="0" y="360" width="420" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="440" y="360" width="640" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="0" y="1440" width="520" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="540" y="1440" width="540" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="0" y="1560" width="330" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="350" y="1560" width="730" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="0" y="1680" width="620" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="640" y="1680" width="440" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="0" y="1800" width="420" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+  <rect x="440" y="1800" width="640" height="110" rx="10" fill="#3D1A10" opacity="0.5"/>
+
+  <!-- Center icon background circle -->
+  <circle cx="540" cy="820" r="220" fill="#2C1208"/>
+
+  <!-- N icon in circle -->
+  <text x="540" y="960" font-family="Arial Black,sans-serif" font-weight="900" font-size="380" fill="#FF6B2B" text-anchor="middle">N</text>
+  <clipPath id="nclip2">
+    <text x="540" y="960" font-family="Arial Black,sans-serif" font-weight="900" font-size="380" text-anchor="middle">N</text>
+  </clipPath>
+  <g clip-path="url(#nclip2)">
+    <rect x="300" y="600" width="480" height="12" fill="#2C1810"/>
+    <rect x="300" y="680" width="480" height="12" fill="#2C1810"/>
+    <rect x="300" y="760" width="480" height="12" fill="#2C1810"/>
+    <rect x="300" y="840" width="480" height="12" fill="#2C1810"/>
+    <rect x="300" y="920" width="480" height="12" fill="#2C1810"/>
+  </g>
+
+  <!-- App name -->
+  <text x="540" y="1110" font-family="Arial Black,sans-serif" font-weight="900" font-size="96" fill="white" text-anchor="middle">NirmanApp</text>
+
+  <!-- Tagline -->
+  <text x="540" y="1180" font-family="Arial,sans-serif" font-weight="400" font-size="44" fill="#FF8F5E" text-anchor="middle">Track your house construction</text>
+
+  <!-- Bottom progress bar decorative -->
+  <rect x="340" y="1700" width="400" height="8" rx="4" fill="#3D1A10"/>
+  <rect x="340" y="1700" width="160" height="8" rx="4" fill="#FF6B2B"/>
+
+  <!-- Bottom tagline -->
+  <text x="540" y="1780" font-family="Arial,sans-serif" font-weight="400" font-size="32" fill="#6B3020" text-anchor="middle">Made with love in Hyderabad</text>
+</svg>

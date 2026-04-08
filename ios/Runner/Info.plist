@@ -1,90 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>NirmanApp</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>nirmanapp</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>NirmanApp needs camera access to capture site photos and proof of work</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>NirmanApp needs photo library access to upload site photos and documents</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>NirmanApp needs permission to save photos to your library</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>NirmanApp needs microphone access for video recording</string>
-
-	<!-- URL Schemes for Google Sign In and OAuth callback -->
-	<key>CFBundleURLTypes</key>
-	<array>
-		<!-- Google Sign In - iOS Client ID reversed -->
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.830334671128-mirsktp407olp2fn7t6l7v0gvckg3e5p</string>
-			</array>
-		</dict>
-		<!-- Supabase OAuth deep link callback -->
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>io.nirmanapp</string>
-			</array>
-		</dict>
-	</array>
-
-	<!-- Google Sign In GIDClientID -->
-	<key>GIDClientID</key>
-	<string>830334671128-mirsktp407olp2fn7t6l7v0gvckg3e5p.apps.googleusercontent.com</string>
-
-	<!-- App Transport Security -->
-	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleDisplayName</key>
+		<string>NirmanApp</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>nirmanapp</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(FLUTTER_BUILD_NAME)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleVersion</key>
+		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>LSRequiresIPhoneOS</key>
+		<true/>
+		<key>NSCameraUsageDescription</key>
+		<string>NirmanApp needs camera access to capture site photos and proof of work</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>NirmanApp needs photo library access to upload site photos and documents</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>NirmanApp needs permission to save photos to your library</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>NirmanApp needs microphone access for video recording</string>
+		<!-- URL Schemes for Google Sign In and OAuth callback -->
+		<key>CFBundleURLTypes</key>
+		<array>
+			<!-- Google Sign In - iOS Client ID reversed -->
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>com.googleusercontent.apps.830334671128-mirsktp407olp2fn7t6l7v0gvckg3e5p</string>
+				</array>
+			</dict>
+			<!-- Supabase OAuth deep link callback -->
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>io.nirmanapp</string>
+				</array>
+			</dict>
+		</array>
+		<!-- Google Sign In GIDClientID -->
+		<key>GIDClientID</key>
+		<string>830334671128-mirsktp407olp2fn7t6l7v0gvckg3e5p.apps.googleusercontent.com</string>
+		<!-- App Transport Security -->
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen</string>
+		<key>UIMainStoryboardFile</key>
+		<string>Main</string>
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
+		<false/>
+		<key>UIStatusBarHidden</key>
 		<true/>
 	</dict>
-
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
-</dict>
 </plist>

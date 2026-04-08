@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <rect width="1024" height="1024" fill="#1A0A04"/>
+  <!-- brick background subtle -->
+  <rect x="0" y="820" width="451" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="491" y="820" width="533" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="0" y="684" width="287" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="328" y="684" width="696" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="0" y="552" width="533" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="573" y="552" width="451" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="0" y="420" width="369" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="409" y="420" width="615" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="0" y="288" width="615" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="655" y="288" width="369" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="0" y="156" width="451" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <rect x="491" y="156" width="533" height="112" rx="10" fill="#3D1A10" opacity="0.8"/>
+  <!-- N in orange -->
+  <text x="512" y="820" font-family="Arial Black,sans-serif" font-weight="900" font-size="760" fill="#FF6B2B" text-anchor="middle">N</text>
+  <!-- brick mortar lines clipped to N shape via overlay -->
+  <clipPath id="nclip">
+    <text x="512" y="820" font-family="Arial Black,sans-serif" font-weight="900" font-size="760" text-anchor="middle">N</text>
+  </clipPath>
+  <g clip-path="url(#nclip)">
+    <rect x="0" y="810" width="1024" height="20" fill="#2C1810"/>
+    <rect x="0" y="674" width="1024" height="20" fill="#2C1810"/>
+    <rect x="0" y="542" width="1024" height="20" fill="#2C1810"/>
+    <rect x="0" y="410" width="1024" height="20" fill="#2C1810"/>
+    <rect x="0" y="278" width="1024" height="20" fill="#2C1810"/>
+    <rect x="0" y="146" width="1024" height="20" fill="#2C1810"/>
+    <rect x="451" y="820" width="20" height="204" fill="#2C1810"/>
+    <rect x="307" y="684" width="20" height="154" fill="#2C1810"/>
+    <rect x="553" y="552" width="20" height="154" fill="#2C1810"/>
+    <rect x="389" y="420" width="20" height="154" fill="#2C1810"/>
+    <rect x="635" y="288" width="20" height="154" fill="#2C1810"/>
+    <rect x="471" y="156" width="20" height="154" fill="#2C1810"/>
+  </g>
+</svg>
