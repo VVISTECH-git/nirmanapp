@@ -16,14 +16,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _signInWithGoogle() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final success = await SupabaseService.signInWithGoogle();
-      if (!success && mounted) {
-        setState(() => _error = 'Sign in cancelled. Please try again.');
-      }
+      await SupabaseService.signInWithGoogle();
     } catch (e) {
-      if (mounted) {
-        setState(() => _error = 'Error: $e');
-      }
+      if (mounted) setState(() => _error = 'Sign in failed. Please try again.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -51,7 +46,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     fontSize: 42,
                     fontWeight: FontWeight.w900,
                     color: Color(0xFFFF6B2B),
-                    fontFamily: 'Arial Black',
                   )),
                 ),
               ),
@@ -91,15 +85,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               if (_error != null) ...[
                 const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFCEBEB),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(_error!,
-                      style: const TextStyle(color: Color(0xFFE24B4A), fontSize: 13)),
-                ),
+                Text(_error!, style: const TextStyle(color: Color(0xFFE24B4A), fontSize: 13)),
               ],
               const SizedBox(height: 20),
               const Text(

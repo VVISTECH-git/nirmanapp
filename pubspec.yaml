@@ -1,7 +1,7 @@
 name: nirmanapp
 description: NirmanApp - House Construction Tracker
 publish_to: 'none'
-version: 1.0.0+3
+version: 1.0.0+4
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -12,9 +12,6 @@ dependencies:
 
   # Supabase
   supabase_flutter: ^2.3.4
-
-  # Google Sign In
-  google_sign_in: ^6.2.1
 
   # State Management
   flutter_riverpod: ^2.5.1
