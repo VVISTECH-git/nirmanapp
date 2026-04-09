@@ -16,7 +16,7 @@ class PhaseDetailScreen extends ConsumerWidget {
     if (projectId == null) return const LoadingScreen();
 
     final phasesAsync = ref.watch(phasesProvider(projectId));
-    final phase = phasesAsync.valueOrNull?.firstWhere((p) => p.id == phaseId, orElse: () => throw Exception('Not found'));
+    final phase = phasesAsync.valueOrNull?.where((p) => p.id == phaseId).firstOrNull;
     final tasksAsync = ref.watch(tasksProvider(projectId));
 
     if (phase == null) return const LoadingScreen();
@@ -53,16 +53,7 @@ class PhaseDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   NirmanProgressBar(progress: phase.progressPct ?? 0, color: color, height: 8),
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GridView.count(
-                        crossAxisCount: 3,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                      ),
-                    ],
-                  ),
+                  // FIX: removed dangling empty GridView.count that was inside a Row
                   Row(children: [
                     Expanded(child: _statItem('Total tasks', '${phase.totalTasks ?? 0}')),
                     Expanded(child: _statItem('Done', '${phase.doneTasks ?? 0}', const Color(0xFF1D9E75))),
@@ -79,7 +70,11 @@ class PhaseDetailScreen extends ConsumerWidget {
               ...tasks.map((t) => Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFEEEEEE), width: 0.5)),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFEEEEEE), width: 0.5),
+                ),
                 child: Row(
                   children: [
                     Expanded(child: Text(t.title, style: const TextStyle(fontSize: 13))),
@@ -116,7 +111,8 @@ class TaskDetailScreen extends ConsumerWidget {
     if (projectId == null) return const LoadingScreen();
 
     final tasksAsync = ref.watch(tasksProvider(projectId));
-    final task = tasksAsync.valueOrNull?.firstWhere((t) => t.id == taskId, orElse: () => throw Exception('Not found'));
+    // FIX: use safe firstOrNull instead of firstWhere with throw
+    final task = tasksAsync.valueOrNull?.where((t) => t.id == taskId).firstOrNull;
 
     if (task == null) return const LoadingScreen();
 
@@ -145,7 +141,11 @@ class TaskDetailScreen extends ConsumerWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFEEEEEE), width: 0.5)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFEEEEEE), width: 0.5),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -201,7 +201,8 @@ class IssueDetailScreen extends ConsumerWidget {
     if (projectId == null) return const LoadingScreen();
 
     final issuesAsync = ref.watch(issuesProvider(projectId));
-    final issue = issuesAsync.valueOrNull?.firstWhere((i) => i.id == issueId, orElse: () => throw Exception('Not found'));
+    // FIX: safe firstOrNull
+    final issue = issuesAsync.valueOrNull?.where((i) => i.id == issueId).firstOrNull;
 
     if (issue == null) return const LoadingScreen();
 
@@ -227,7 +228,11 @@ class IssueDetailScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFEEEEEE), width: 0.5)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFEEEEEE), width: 0.5),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -288,7 +293,8 @@ class DailyLogScreen extends ConsumerWidget {
               subtitle: 'Start logging daily site activity',
               icon: Icons.edit_note,
               buttonLabel: 'Log today',
-              onButton: () => Navigator.pushNamed(context, '/daily-log/add'),
+              // FIX: use context.push instead of Navigator.pushNamed
+              onButton: () => context.push('/daily-log/add'),
             );
           }
           return ListView.builder(
@@ -305,7 +311,10 @@ class DailyLogScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isToday ? const Color(0xFF378ADD) : const Color(0xFFEEEEEE), width: isToday ? 1.5 : 0.5),
+                  border: Border.all(
+                    color: isToday ? const Color(0xFF378ADD) : const Color(0xFFEEEEEE),
+                    width: isToday ? 1.5 : 0.5,
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,7 +323,11 @@ class DailyLogScreen extends ConsumerWidget {
                       children: [
                         Text(
                           isToday ? 'Today' : '${log.logDate.day}/${log.logDate.month}/${log.logDate.year}',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: isToday ? const Color(0xFF378ADD) : const Color(0xFF1A1A1A)),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: isToday ? const Color(0xFF378ADD) : const Color(0xFF1A1A1A),
+                          ),
                         ),
                         const Spacer(),
                         if (log.weather != null) ...[
@@ -330,7 +343,9 @@ class DailyLogScreen extends ConsumerWidget {
                     ),
                     if (log.workSummary != null) ...[
                       const SizedBox(height: 8),
-                      Text(log.workSummary!, style: const TextStyle(fontSize: 13, color: Color(0xFF444444), height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                      Text(log.workSummary!,
+                        style: const TextStyle(fontSize: 13, color: Color(0xFF444444), height: 1.4),
+                        maxLines: 2, overflow: TextOverflow.ellipsis),
                     ],
                     if (log.issuesNoted != null) ...[
                       const SizedBox(height: 6),
@@ -338,7 +353,9 @@ class DailyLogScreen extends ConsumerWidget {
                         children: [
                           const Icon(Icons.warning_amber_outlined, size: 13, color: Color(0xFFBA7517)),
                           const SizedBox(width: 4),
-                          Expanded(child: Text(log.issuesNoted!, style: const TextStyle(fontSize: 12, color: Color(0xFFBA7517)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          Expanded(child: Text(log.issuesNoted!,
+                            style: const TextStyle(fontSize: 12, color: Color(0xFFBA7517)),
+                            maxLines: 1, overflow: TextOverflow.ellipsis)),
                         ],
                       ),
                     ],
@@ -418,7 +435,11 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
               },
               child: Container(
                 padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFE0E0E0))),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFE0E0E0)),
+                ),
                 child: Row(children: [
                   const Icon(Icons.calendar_today, size: 16, color: Color(0xFF9E9E9E)),
                   const SizedBox(width: 8),
@@ -431,7 +452,8 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: _loading ? null : () => _submit(projectId!),
+                // FIX: guard against null projectId instead of force-unwrapping
+                onPressed: _loading || projectId == null ? null : _submit,
                 child: _loading ? const CircularProgressIndicator(color: Colors.white) : const Text('Save expense', style: TextStyle(fontSize: 16)),
               ),
             ),
@@ -441,7 +463,9 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     );
   }
 
-  void _submit(String projectId) async {
+  void _submit() async {
+    final projectId = ref.read(selectedProjectIdProvider);
+    if (projectId == null) return;
     if (_titleCtrl.text.trim().isEmpty || _amountCtrl.text.isEmpty) return;
     setState(() => _loading = true);
     try {
@@ -479,4 +503,3 @@ class PaymentsScreen extends ConsumerWidget {
     );
   }
 }
-

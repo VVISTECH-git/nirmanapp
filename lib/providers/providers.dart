@@ -1,6 +1,7 @@
 // lib/providers/providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../services/supabase_service.dart';
 
@@ -22,7 +23,37 @@ final currentProfileProvider = FutureProvider<UserProfile?>((ref) async {
 
 // ─── SELECTED PROJECT ────────────────────────────────────
 
+// FIX: selectedProjectIdProvider is pure in-memory state.
+// Persistence is handled only in projectInitProvider (load) and
+// projectPersistProvider (save), eliminating the read/write race
+// that caused 1680 skipped frames on startup.
 final selectedProjectIdProvider = StateProvider<String?>((ref) => null);
+
+final projectInitProvider = FutureProvider<void>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return;
+
+  final projects = await SupabaseService.getProjects();
+  if (projects.isEmpty) return;
+
+  final prefs = await SharedPreferences.getInstance();
+  final savedId = prefs.getString('selected_project_id');
+
+  final validId = projects.any((p) => p.id == savedId)
+      ? savedId
+      : projects.first.id;
+
+  ref.read(selectedProjectIdProvider.notifier).state = validId;
+});
+
+// FIX: Persist selection changes asynchronously without blocking the build.
+final projectPersistProvider = Provider<void>((ref) {
+  ref.listen<String?>(selectedProjectIdProvider, (_, next) async {
+    if (next == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_project_id', next);
+  });
+});
 
 final selectedProjectProvider = FutureProvider<Project?>((ref) async {
   final id = ref.watch(selectedProjectIdProvider);

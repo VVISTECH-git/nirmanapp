@@ -7,8 +7,11 @@ import '../services/supabase_service.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/pending_approval_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
+// create_project_screen.dart also exports ProjectSelectionScreen
 import '../screens/dashboard/create_project_screen.dart';
 import '../screens/plan/project_plan_screen.dart';
+// phase_detail_screen.dart also exports TaskDetailScreen, IssueDetailScreen,
+// AddExpenseScreen, PaymentsScreen, DailyLogScreen
 import '../screens/plan/phase_detail_screen.dart';
 import '../screens/tasks/tasks_screen.dart';
 import '../screens/expenses/expenses_screen.dart';
@@ -23,6 +26,9 @@ import '../widgets/main_shell.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
+// FIX: routerProvider uses ref.watch(currentProfileProvider) so GoRouter
+// refreshes on auth+profile changes without needing GoRouterRefreshStream
+// to be duplicated in multiple places.
 final routerProvider = Provider<GoRouter>((ref) {
   final profile = ref.watch(currentProfileProvider);
 

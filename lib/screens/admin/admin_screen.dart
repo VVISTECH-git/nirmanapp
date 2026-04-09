@@ -19,9 +19,9 @@ class AdminScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Admin panel')),
       body: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: SectionHeader('Access requests'),
             ),
           ),
@@ -48,9 +48,9 @@ class AdminScreen extends ConsumerWidget {
               );
             },
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: SectionHeader('Approved users'),
             ),
           ),

@@ -55,7 +55,7 @@ class ExpensesScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 16),
                         // Category breakdown
-                        SectionHeader('By category'),
+                        const SectionHeader('By category'),
                         summaryAsync.when(
                           loading: () => const CircularProgressIndicator(),
                           error: (_, __) => const SizedBox.shrink(),
@@ -107,7 +107,7 @@ class ExpensesScreen extends ConsumerWidget {
 }
 
 class _BudgetSummary extends StatelessWidget {
-  final project;
+  final Project project;
   const _BudgetSummary({required this.project});
 
   @override

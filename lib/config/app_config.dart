@@ -18,12 +18,12 @@ class AppConfig {
   static const appName = 'NirmanApp';
   static const appTagline = 'Track your house construction';
   static const superAdminEmail = 'nirmanapphq@gmail.com';
-  static const deepLinkScheme = 'io.nirmanapp';
+  static const deepLinkScheme = 'com.vvis.nirmanapp';
   static const deepLinkHost = 'login-callback';
 
   // Apple Developer
   static const appleTeamId = '4M469N5493';
-  static const bundleId = 'com.nirmanapp.app';
+  static const bundleId = 'com.vvis.nirmanapp';
 
   // Storage buckets
   static const documentsBucket = 'documents';
