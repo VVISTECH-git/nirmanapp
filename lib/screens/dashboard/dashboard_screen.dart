@@ -1,235 +1,213 @@
-// lib/screens/dashboard/dashboard_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../providers/providers.dart';
-import '../../widgets/shared_widgets.dart';
-import '../../models/models.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../plan/phase_detail_screen.dart';
+import '../work/work_screen.dart';
+import '../money/money_screen.dart';
+import '../dailylog/daily_log_screen.dart';
+import '../docs/docs_screen.dart';
+import '../resources/resources_screen.dart';
+import '../work/add_task_screen.dart';
+import '../money/add_expense_screen.dart';
 
-class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({super.key});
+class DashboardScreen extends StatefulWidget {
+  final Map<String, dynamic> project;
+  const DashboardScreen({super.key, required this.project});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Watch project init - this triggers auto-load
-    final initAsync = ref.watch(projectInitProvider);
-    final projectId = ref.watch(selectedProjectIdProvider);
-    final profileAsync = ref.watch(currentProfileProvider);
-
-    // Show loading while init is running
-    if (initAsync.isLoading) {
-      return const LoadingScreen();
-    }
-
-    if (projectId == null) {
-      return _NoProjectScreen(ref: ref);
-    }
-
-    final projectAsync = ref.watch(selectedProjectProvider);
-    final phasesAsync = ref.watch(phasesProvider(projectId));
-    final todayLogAsync = ref.watch(todayLogProvider(projectId));
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      body: projectAsync.when(
-        loading: () => const LoadingScreen(),
-        error: (e, _) => EmptyState(title: 'Error', subtitle: e.toString(), icon: Icons.error_outline),
-        data: (project) {
-          if (project == null) return const LoadingScreen();
-          final profile = profileAsync.valueOrNull;
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 160,
-                pinned: true,
-                backgroundColor: const Color(0xFF1A2B4A),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    color: const Color(0xFF1A2B4A),
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Good ${_greeting()}, ${profile?.displayName.split(' ').first ?? ''}!',
-                                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  GestureDetector(
-                                    onTap: () => context.push('/projects'),
-                                    child: Row(
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            project.name,
-                                            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        const Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 18),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (profile?.isSuperAdmin == true)
-                              IconButton(
-                                icon: const Icon(Icons.admin_panel_settings_outlined, color: Colors.white70),
-                                onPressed: () => context.push('/admin'),
-                              ),
-                            IconButton(
-                              icon: const Icon(Icons.notifications_outlined, color: Colors.white70),
-                              onPressed: () => context.push('/notifications'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Daily log CTA
-                      todayLogAsync.when(
-                        loading: () => const SizedBox.shrink(),
-                        error: (_, __) => const SizedBox.shrink(),
-                        data: (log) => log == null
-                            ? GestureDetector(
-                                onTap: () => context.push('/daily-log/add'),
-                                child: Container(
-                                  padding: const EdgeInsets.all(14),
-                                  margin: const EdgeInsets.only(bottom: 16),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFFFF8EC),
-                                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                                  ),
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.edit_note, color: Color(0xFFEF9F27)),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Text("Log today's site activity",
-                                            style: TextStyle(color: Color(0xFFEF9F27), fontWeight: FontWeight.w500)),
-                                      ),
-                                      Icon(Icons.arrow_forward_ios, color: Color(0xFFEF9F27), size: 14),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-
-                      // Metrics
-                      Row(
-                        children: [
-                          Expanded(child: MetricCard(label: 'Budget', value: formatRupees(project.totalBudgetPaise, compact: true))),
-                          const SizedBox(width: 10),
-                          Expanded(child: MetricCard(label: 'Spent', value: formatRupees(project.totalSpentPaise ?? 0, compact: true))),
-                          const SizedBox(width: 10),
-                          Expanded(child: MetricCard(
-                            label: 'Tasks',
-                            value: '${project.openTasks ?? 0}',
-                            valueColor: project.overdueTasks != null && project.overdueTasks! > 0
-                                ? const Color(0xFFE24B4A) : null,
-                          )),
-                          const SizedBox(width: 10),
-                          Expanded(child: MetricCard(
-                            label: 'Issues',
-                            value: '${project.openIssues ?? 0}',
-                            valueColor: project.openIssues != null && project.openIssues! > 0
-                                ? const Color(0xFFE24B4A) : null,
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Budget progress
-                      _BudgetProgress(project: project),
-                      const SizedBox(height: 16),
-
-                      // Quick actions
-                      const SectionHeader('Quick actions'),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(child: _QuickAction(icon: Icons.add_task, label: 'Add task', onTap: () => context.push('/tasks'))),
-                          const SizedBox(width: 10),
-                          Expanded(child: _QuickAction(icon: Icons.warning_amber_outlined, label: 'Log issue', onTap: () => context.push('/issues'))),
-                          const SizedBox(width: 10),
-                          Expanded(child: _QuickAction(icon: Icons.receipt_long_outlined, label: 'Add expense', onTap: () => context.push('/expenses'))),
-                          const SizedBox(width: 10),
-                          Expanded(child: _QuickAction(icon: Icons.people_outline, label: 'Resources', onTap: () => context.push('/resources'))),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Phase progress
-                      const SectionHeader('Phase progress'),
-                      const SizedBox(height: 10),
-                      phasesAsync.when(
-                        loading: () => const LoadingScreen(),
-                        error: (e, _) => const SizedBox.shrink(),
-                        data: (phases) => Column(
-                          children: phases.map((phase) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _PhaseProgressCard(phase: phase),
-                          )).toList(),
-                        ),
-                      ),
-                      const SizedBox(height: 80),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  String _greeting() {
-    final h = DateTime.now().hour;
-    if (h < 12) return 'morning';
-    if (h < 17) return 'afternoon';
-    return 'evening';
-  }
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _NoProjectScreen extends StatelessWidget {
-  final WidgetRef ref;
-  const _NoProjectScreen({required this.ref});
+class _DashboardScreenState extends State<DashboardScreen> {
+  final _client = Supabase.instance.client;
+  List<Map<String, dynamic>> _phases = [];
+  bool _loading = true;
+  String? _error;
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPhases();
+  }
+
+  Future<void> _loadPhases() async {
+    try {
+      final res = await _client
+          .from('phase_progress')
+          .select()
+          .eq('project_id', widget.project['id'])
+          .order('order_index');
+      if (mounted) {
+        setState(() { _phases = List<Map<String, dynamic>>.from(res); _loading = false; });
+      }
+    } catch (e) {
+      if (mounted) setState(() { _error = e.toString(); _loading = false; });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return EmptyState(
-      icon: Icons.construction,
-      title: 'No project yet',
-      subtitle: 'Create your first construction project to get started',
-      buttonLabel: 'Create project',
-      onButton: () => context.push('/create-project'),
+    final tabs = [
+      _HomeTab(project: widget.project, phases: _phases, loading: _loading, error: _error),
+      _PlanTab(project: widget.project, phases: _phases, loading: _loading),
+      WorkScreen(projectId: widget.project['id']),
+      MoneyScreen(project: widget.project),
+      DocsScreen(projectId: widget.project['id']),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.project['name'] ?? '')),
+      body: tabs[_selectedIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (i) => setState(() => _selectedIndex = i),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.list_alt_outlined), selectedIcon: Icon(Icons.list_alt), label: 'Plan'),
+          NavigationDestination(icon: Icon(Icons.task_outlined), selectedIcon: Icon(Icons.task), label: 'Work'),
+          NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: 'Money'),
+          NavigationDestination(icon: Icon(Icons.folder_outlined), selectedIcon: Icon(Icons.folder), label: 'Docs'),
+        ],
+      ),
     );
   }
 }
 
-class _QuickAction extends StatelessWidget {
+// ─── HOME TAB ───────────────────────────────────────────
+class _HomeTab extends StatelessWidget {
+  final Map<String, dynamic> project;
+  final List<Map<String, dynamic>> phases;
+  final bool loading;
+  final String? error;
+
+  const _HomeTab({required this.project, required this.phases, required this.loading, this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading) return const Center(child: CircularProgressIndicator());
+    if (error != null) return Center(child: Text('Error: $error', style: const TextStyle(color: Colors.red)));
+
+    final budgetPaise = (project['total_budget_paise'] ?? 0) as num;
+    final spentPaise = (project['total_spent_paise'] ?? 0) as num;
+    final budgetL = budgetPaise / 10000000;
+    final spentL = spentPaise / 10000000;
+    final pct = budgetPaise > 0 ? (spentPaise / budgetPaise).clamp(0.0, 1.0) : 0.0;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // Daily Log CTA
+        GestureDetector(
+          onTap: () => Navigator.push(context, MaterialPageRoute(
+            builder: (_) => AddDailyLogScreen(projectId: project['id']))),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF8EC),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFFFCC80)),
+            ),
+            child: const Row(children: [
+              Icon(Icons.edit_note, color: Colors.orange),
+              SizedBox(width: 10),
+              Expanded(child: Text("Log today's site activity",
+                  style: TextStyle(color: Colors.orange, fontWeight: FontWeight.w500))),
+              Icon(Icons.arrow_forward_ios, color: Colors.orange, size: 14),
+            ]),
+          ),
+        ),
+        // Metrics
+        Row(children: [
+          _MetricCard(label: 'Budget', value: '₹${budgetL.toStringAsFixed(1)}L'),
+          const SizedBox(width: 8),
+          _MetricCard(label: 'Spent', value: '₹${spentL.toStringAsFixed(1)}L'),
+          const SizedBox(width: 8),
+          _MetricCard(label: 'Tasks', value: '${project['open_tasks'] ?? 0}'),
+          const SizedBox(width: 8),
+          _MetricCard(label: 'Issues', value: '${project['open_issues'] ?? 0}'),
+        ]),
+        const SizedBox(height: 16),
+
+        // Budget progress
+        const Text('Budget utilization', style: TextStyle(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
+        LinearProgressIndicator(value: pct.toDouble(), minHeight: 8,
+            borderRadius: BorderRadius.circular(4)),
+        const SizedBox(height: 4),
+        Text('${(pct * 100).round()}% of ₹${budgetL.toStringAsFixed(1)}L used',
+            style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        const SizedBox(height: 16),
+
+        // Quick actions
+        Row(children: [
+          Expanded(child: _QuickActionBtn(
+            icon: Icons.people_outline, label: 'Resources',
+            onTap: () => Navigator.push(context, MaterialPageRoute(
+              builder: (_) => ResourcesScreen(projectId: project['id']))))),
+          const SizedBox(width: 10),
+          Expanded(child: _QuickActionBtn(
+            icon: Icons.swap_horiz, label: 'Switch Project',
+            onTap: () => Navigator.pop(context))),
+        ]),
+        const SizedBox(height: 24),
+
+        // Phase summary
+        const Text('Phase Progress', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+        const SizedBox(height: 10),
+        ...phases.map((phase) => _PhaseCard(phase: phase, onTap: null)),
+      ]),
+    );
+  }
+}
+
+// ─── PLAN TAB ───────────────────────────────────────────
+class _PlanTab extends StatelessWidget {
+  final Map<String, dynamic> project;
+  final List<Map<String, dynamic>> phases;
+  final bool loading;
+
+  const _PlanTab({required this.project, required this.phases, required this.loading});
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading) return const Center(child: CircularProgressIndicator());
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: phases.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (_, i) => _PhaseCard(
+        phase: phases[i],
+        onTap: () => Navigator.push(context, MaterialPageRoute(
+          builder: (_) => PhaseDetailScreen(
+            phase: phases[i],
+            projectId: project['id'],
+          ),
+        )),
+      ),
+    );
+  }
+}
+
+// ─── PLACEHOLDER TAB ────────────────────────────────────
+class _PlaceholderTab extends StatelessWidget {
+  final String label;
+  const _PlaceholderTab({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('$label — coming soon',
+        style: const TextStyle(fontSize: 16, color: Colors.grey)));
+  }
+}
+
+// ─── SHARED WIDGETS ─────────────────────────────────────
+class _QuickActionBtn extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  const _QuickAction({required this.icon, required this.label, required this.onTap});
+  const _QuickActionBtn({required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -240,98 +218,105 @@ class _QuickAction extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE8ECF0)),
+          border: Border.all(color: Colors.grey.shade200),
         ),
-        child: Column(
-          children: [
-            Icon(icon, color: const Color(0xFF378ADD), size: 22),
-            const SizedBox(height: 4),
-            Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFF666666)), textAlign: TextAlign.center),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PhaseProgressCard extends StatelessWidget {
-  final Phase phase;
-  const _PhaseProgressCard({required this.phase});
-
-  @override
-  Widget build(BuildContext context) {
-    final pct = phase.progressPct ?? 0.0;
-    final color = Color(int.parse(phase.color.replaceFirst('#', '0xFF')));
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE8ECF0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(phase.name,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                    overflow: TextOverflow.ellipsis),
-              ),
-              StatusBadge(phase.status),
-            ],
-          ),
-          const SizedBox(height: 8),
-          NirmanProgressBar(progress: pct, color: color),
+        child: Column(children: [
+          Icon(icon, color: const Color(0xFF378ADD), size: 22),
           const SizedBox(height: 4),
-          Text('${(pct * 100).round()}% complete',
-              style: const TextStyle(fontSize: 11, color: Color(0xFF999999))),
-        ],
+          Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        ]),
       ),
     );
   }
 }
 
-class _BudgetProgress extends StatelessWidget {
-  final Project project;
-  const _BudgetProgress({required this.project});
+class _MetricCard extends StatelessWidget {
+  final String label, value;
+  const _MetricCard({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    final pct = project.progressPercent;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE8ECF0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Budget utilization', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-              Text('${(pct * 100).round()}%', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF378ADD))),
-            ],
-          ),
-          const SizedBox(height: 10),
-          NirmanProgressBar(progress: pct, color: const Color(0xFF378ADD)),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Spent: ${formatRupees(project.totalSpentPaise ?? 0, compact: true)}',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF666666))),
-              Text('Budget: ${formatRupees(project.totalBudgetPaise, compact: true)}',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF666666))),
-            ],
-          ),
-        ],
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(children: [
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        ]),
       ),
     );
+  }
+}
+
+class _PhaseCard extends StatelessWidget {
+  final Map<String, dynamic> phase;
+  final VoidCallback? onTap;
+  const _PhaseCard({required this.phase, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = ((phase['progress_pct'] ?? 0.0) as num).toDouble();
+    final color = _statusColor(phase['status'] ?? 'upcoming');
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Expanded(child: Text(phase['name'] ?? '',
+                style: const TextStyle(fontWeight: FontWeight.w500))),
+            Row(children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  (phase['status'] ?? '').toString().replaceAll('_', ' '),
+                  style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w500),
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 4),
+                Icon(Icons.chevron_right, size: 16, color: Colors.grey.shade400),
+              ]
+            ]),
+          ]),
+          const SizedBox(height: 8),
+          LinearProgressIndicator(
+            value: pct / 100,
+            minHeight: 6,
+            borderRadius: BorderRadius.circular(3),
+            color: color,
+            backgroundColor: Colors.grey.shade100,
+          ),
+          const SizedBox(height: 4),
+          Text('${pct.round()}% complete',
+              style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        ]),
+      ),
+    );
+  }
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'done': return Colors.green;
+      case 'in_progress': return Colors.blue;
+      case 'on_hold': return Colors.orange;
+      default: return Colors.grey;
+    }
   }
 }

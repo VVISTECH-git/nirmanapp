@@ -12,6 +12,7 @@ final authStateProvider = StreamProvider<AuthState>((ref) {
 });
 
 final currentUserProvider = Provider<User?>((ref) {
+  ref.watch(authStateProvider);
   return SupabaseService.currentUser;
 });
 
@@ -23,21 +24,25 @@ final currentProfileProvider = FutureProvider<UserProfile?>((ref) async {
 
 // ─── SELECTED PROJECT ────────────────────────────────────
 
-// FIX: selectedProjectIdProvider is pure in-memory state.
-// Persistence is handled only in projectInitProvider (load) and
-// projectPersistProvider (save), eliminating the read/write race
-// that caused 1680 skipped frames on startup.
 final selectedProjectIdProvider = StateProvider<String?>((ref) => null);
 
 final projectInitProvider = FutureProvider<void>((ref) async {
-  final user = ref.watch(currentUserProvider);
-  if (user == null) return;
+  // Watch auth state stream directly — ensures this re-runs on every
+  // auth event (signIn, tokenRefresh) not just currentUser snapshot
+  final authState = ref.watch(authStateProvider);
+
+  // Only proceed when we have an active authenticated session
+  final session = authState.valueOrNull?.session;
+  if (session == null) return;
+
+  // Wait for session to be fully attached to the Supabase client
+  await Future.delayed(const Duration(milliseconds: 300));
 
   final projects = await SupabaseService.getProjects();
   if (projects.isEmpty) return;
 
   final prefs = await SharedPreferences.getInstance();
-  final savedId = prefs.getString('selected_project_id');
+  final savedId = prefs.getString('selected_project_id_${session.user.id}');
 
   final validId = projects.any((p) => p.id == savedId)
       ? savedId
@@ -46,12 +51,12 @@ final projectInitProvider = FutureProvider<void>((ref) async {
   ref.read(selectedProjectIdProvider.notifier).state = validId;
 });
 
-// FIX: Persist selection changes asynchronously without blocking the build.
 final projectPersistProvider = Provider<void>((ref) {
+  final user = ref.watch(currentUserProvider);
   ref.listen<String?>(selectedProjectIdProvider, (_, next) async {
-    if (next == null) return;
+    if (next == null || user == null) return;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selected_project_id', next);
+    await prefs.setString('selected_project_id_${user.id}', next);
   });
 });
 

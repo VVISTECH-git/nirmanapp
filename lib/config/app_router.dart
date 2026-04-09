@@ -2,16 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/providers.dart';
+import '../models/models.dart';
 import '../services/supabase_service.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/pending_approval_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
-// create_project_screen.dart also exports ProjectSelectionScreen
 import '../screens/dashboard/create_project_screen.dart';
 import '../screens/plan/project_plan_screen.dart';
-// phase_detail_screen.dart also exports TaskDetailScreen, IssueDetailScreen,
-// AddExpenseScreen, PaymentsScreen, DailyLogScreen
 import '../screens/plan/phase_detail_screen.dart';
 import '../screens/tasks/tasks_screen.dart';
 import '../screens/expenses/expenses_screen.dart';
@@ -23,18 +22,20 @@ import '../screens/notifications/notifications_screen.dart';
 import '../screens/admin/admin_screen.dart';
 import '../widgets/main_shell.dart';
 
+// Keys created ONCE at module level — never recreated
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
-// FIX: routerProvider uses ref.watch(currentProfileProvider) so GoRouter
-// refreshes on auth+profile changes without needing GoRouterRefreshStream
-// to be duplicated in multiple places.
+// Router created ONCE — stored in a singleton notifier
+// Uses a ChangeNotifier to refresh on auth/profile changes
+// without recreating the router itself
 final routerProvider = Provider<GoRouter>((ref) {
-  final profile = ref.watch(currentProfileProvider);
+  final notifier = _RouterNotifier(ref);
 
-  return GoRouter(
+  final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/dashboard',
+    refreshListenable: notifier,
     redirect: (context, state) {
       final user = SupabaseService.currentUser;
       final isLoginRoute = state.matchedLocation == '/login';
@@ -44,7 +45,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         return isLoginRoute ? null : '/login';
       }
 
-      final profileData = profile.valueOrNull;
+      final profileData = notifier.profile?.valueOrNull;
       if (profileData == null) return null;
 
       if (!profileData.isApproved && !profileData.isSuperAdmin) {
@@ -92,4 +93,26 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  ref.onDispose(() {
+    notifier.dispose();
+    router.dispose();
+  });
+
+  return router;
 });
+
+class _RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+  AsyncValue<UserProfile?>? profile;
+
+  _RouterNotifier(this._ref) {
+    // Listen to auth state changes
+    _ref.listen(authStateProvider, (_, __) => notifyListeners());
+    // Listen to profile changes
+    _ref.listen(currentProfileProvider, (_, next) {
+      profile = next;
+      notifyListeners();
+    });
+  }
+}
